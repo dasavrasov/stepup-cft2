@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AccountSnapshot {
-    private String name;
-    private Map<Currency, Integer> values;
+    private final String name;
+    private final Map<Currency, Integer> values;
 
     public AccountSnapshot(String name, Map<Currency, Integer> values) {
         this.name = name;

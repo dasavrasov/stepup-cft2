@@ -4,9 +4,9 @@ import java.util.*;
 
 public class Account {
     private String name;
-    private Map<Currency, Integer> values = new HashMap<>();
+    private Map<Currency, Integer> values;
 
-    private Deque<AccountHistory> history = new ArrayDeque<>();
+    private final Deque<AccountHistory> history = new ArrayDeque<>();
 
     public String getName() {
         return name;
