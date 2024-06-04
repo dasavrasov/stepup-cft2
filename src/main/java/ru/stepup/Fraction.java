@@ -14,6 +14,7 @@ public class Fraction implements Fractionable {
         this.denum = denum;
     }
     @Override
+    @Mutator
     public void setNum(int num) {
         this.num = num;
     }
@@ -24,6 +25,7 @@ public class Fraction implements Fractionable {
     }
 
     @Override
+    @Cache
     public double doubleValue() {
         System.out.println("Invoke doubleValue()");
         return (double) num / denum;
