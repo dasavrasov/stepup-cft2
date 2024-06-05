@@ -1,34 +1,30 @@
 package ru.stepup;
 
-public class Fraction implements Fractionable {
+public class FractionTest implements Fractionable{
     private int num;
     private int denum;
 
-    public Fraction() {
-        this.num = 0;
-        this.denum = 1;
-    }
+    static int count=0;
 
-    public Fraction(int num, int denum) {
+    public FractionTest(int num, int denum) {
         this.num = num;
         this.denum = denum;
+        count=0;
     }
-    @Override
-    @Mutator
+
+    @Override @Mutator
     public void setNum(int num) {
         this.num = num;
     }
 
-    @Override
-    @Mutator
+    @Override @Mutator
     public void setDenum(int denum) {
         this.denum = denum;
     }
 
-    @Override
-    @Cache
+    @Override @Cache
     public double doubleValue() {
-        System.out.println("Invoke doubleValue()");
+        count++;
         return (double) num / denum;
     }
 
