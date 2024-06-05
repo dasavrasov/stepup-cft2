@@ -4,9 +4,9 @@ import java.util.*;
 
 public class Account {
     private String name;
-    private Map<Currency, Integer> values;
+    private Map<Currency, Integer> values=new HashMap<>();
 
-    private final Deque<AccountHistory> history = new ArrayDeque<>();
+    private final Deque<Command> saves = new ArrayDeque<>();
 
     public String getName() {
         return name;
@@ -16,12 +16,13 @@ public class Account {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Имя не может быть null или пустым");
         }
-        saveToHistory(this.name, null, 0); //изменилось только имя, валюту не будем сохранять в историю
+        String tmp = Account.this.name; //предыдущее имя
+        saves.push(()->Account.this.name=tmp); //сохраняем действие сохранения предыдущего имени
         this.name = name;
     }
 
     public Map<Currency, Integer> getValues    () {
-        return values;
+        return new HashMap<>(values);
     }
 
     public Account(String name) {
@@ -45,61 +46,36 @@ public class Account {
         //если валюта есть в списке, то обновляем количество, если нет, добавляем
 
         if (values.containsKey(currency))
-            saveToHistory(null,currency,values.get(currency)); //сохраняем предыдущее состояние
+            saves.push(()->values.put(currency, this.values.get(currency))); //сохраняем действие обновления количества
         else
-            saveToHistory(null,currency,0);
+            saves.push(()->values.remove(currency)); //сохраняем действие удаления валюты
         values.put(currency, amount);
     }
 
-    private void saveToHistory(String name, Currency currency, int amount) {
-        history.push(new AccountHistory(name, currency, amount));
-    }
 
     public void undo() {
-        if (!history.isEmpty()) {
-            AccountHistory hist = history.pop();
-            if (hist.getName()!=null) //если имя изменилось, то восстанавливаем предыдущее состояние
-                name = hist.getName();
-            if (hist.getCurrency()!=null && hist.getAmount()!=0) //если имя не изменилось, то восстанавливаем количество валюты
-                values.put(hist.getCurrency(), hist.getAmount());
-            if (hist.getCurrency()!=null && hist.getAmount()==0) //если имя не изменилось, то удаляем валюту
-                values.remove(hist.getCurrency());
-        }
+        saves.pop().make();
     }
 
-    private static class AccountHistory {
-        private final String name;
-        private final Currency currency;
-        private final int amount;
-
-        public AccountHistory(String name, Currency currency, int amount) {
-            this.name = name;
-            this.currency = currency;
-            this.amount = amount;
-        }
-
-
-        public String getName() {
-            return name;
-        }
-
-        public Currency getCurrency() {
-            return currency;
-        }
-
-        public int getAmount() {
-            return amount;
-        }
+    interface Command {
+        void make();
     }
+
 
     //3
-    public AccountSnapshot saveToSnapshot() {
-        return AccountSnapshot.createInstance(this);
-    }
+//    public Save save()   {
+//        return new AccSave();
+//    }
+//
+//    private class AccSave implements Save {
+//        private String name = Account.this.name;
+//        private Map<Currency, Integer> values = new HashMap<>(Account.this.values);
+//        public void load() {
+//            Account.this.name = name;
+//            Account.this.values.clear();
+//            Account.this.values.putAll(values);
+//        }
+//    }
 
-    public void restoreFromSnapshot(AccountSnapshot snapshot) {
-        this.name = snapshot.getName();
-        this.values = new HashMap<>(snapshot.getValues());
-    }
 
 }
