@@ -45,10 +45,11 @@ public class Account {
         }
         //если валюта есть в списке, то обновляем количество, если нет, добавляем
 
+        Integer tmp=Account.this.values.get(currency);
         if (values.containsKey(currency))
-            saves.push(()->values.put(currency, this.values.get(currency))); //сохраняем действие обновления количества
+            saves.push(()->values.put(currency, tmp)); //сохраняем действие обновления количества
         else
-            saves.push(()->values.remove(currency)); //сохраняем действие удаления валюты
+            saves.push(()->Account.this.values.remove(currency)); //сохраняем действие удаления валюты
         values.put(currency, amount);
     }
 

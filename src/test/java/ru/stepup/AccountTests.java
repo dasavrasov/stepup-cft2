@@ -3,6 +3,7 @@ package ru.stepup;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class AccountTests {
@@ -26,15 +27,15 @@ public class AccountTests {
         //Валюта не может быть null
         assertThrows(IllegalArgumentException.class, () -> account.changeCurrencyAmount(null, 100));
         account.changeCurrencyAmount(Currency.USD, 100);
-        assert (account.getValues().get(Currency.USD) == 100);
+        assertEquals (100,account.getValues().get(Currency.USD)) ;
         //Количество не может быть отрицательным
         assertThrows(IllegalArgumentException.class, () -> account.changeCurrencyAmount(Currency.USD, -100));
         //Изменение количества USD
         account.changeCurrencyAmount(Currency.USD, 200);
-        assert (account.getValues().get(Currency.USD) == 200);
+        assertEquals (200,account.getValues().get(Currency.USD));
         //Если такой валюты еще нет - добавляем в список
         account.changeCurrencyAmount(Currency.EUR, 300);
-        assert (account.getValues().get(Currency.EUR) == 300);
+        assertEquals (300,account.getValues().get(Currency.EUR)) ;
     }
 
     //Задание 2 - Отмена
@@ -44,16 +45,16 @@ public class AccountTests {
         Account account = new Account("Иванов Иван Иванович");
         //добавили 100 рублей
         account.changeCurrencyAmount(Currency.RUB, 100);
-        assert (account.getValues().get(Currency.RUB) == 100);
+        assertEquals (100,account.getValues().get(Currency.RUB));
         //меняем имя на Василий Иванов
         account.setName("Василий Иванов");
-        assert (account.getName().equals("Василий Иванов"));
+        assertEquals ("Василий Иванов",account.getName());
         account.setName("Василий Сидоров");
-        assert (account.getName().equals("Василий Сидоров"));
+        assertEquals ("Василий Сидоров",account.getName());
         account.undo();
-        assert (account.getName().equals("Василий Иванов"));
+        assertEquals ("Василий Иванов",account.getName());
         account.undo();
-        assert (account.getName().equals("Иванов Иван Иванович"));
+        assertEquals ("Иванов Иван Иванович",account.getName());
     }
     @Test
     @DisplayName("Тест undo изменения количества валюты")
@@ -61,17 +62,16 @@ public class AccountTests {
         Account account = new Account("Иванов Иван Иванович");
         //добавили 100 рублей
         account.changeCurrencyAmount(Currency.RUB, 100);
-        assert (account.getValues().get(Currency.RUB) == 100);
+        assertEquals (100,account.getValues().get(Currency.RUB));
         //установили количество рублей 300
         account.changeCurrencyAmount(Currency.RUB, 300);
-        assert (account.getValues().get(Currency.RUB) == 300);
+        assertEquals (300,account.getValues().get(Currency.RUB));
 
-        account.undo();
-        assert (account.getValues().get(Currency.RUB) == 100);
-//        account.undo();
-//        assert (account.getName().equals("Иванов Иван Иванович"));
-//        account.undo();
-//        assert (account.getValues().get(Currency.RUB) == null);
+        account.undo(); //изменение суммы
+        assertEquals(100,account.getValues().get(Currency.RUB));
+
+        account.undo(); //удаление валюты
+        assert (account.getValues().get(Currency.RUB) == null);
     }
 
     //Задание 3 - сохранение снапшота
