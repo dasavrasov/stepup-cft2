@@ -26,14 +26,10 @@ public class Account {
     }
 
     public Account(String name) {
-        this(name, new HashMap<>());
-    }
-    public Account(String name, Map<Currency, Integer> values) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Имя не может быть null или пустым");
         }
         this.name = name;
-        this.values = values;
     }
 
     public void changeCurrencyAmount(Currency currency, int amount) {
@@ -64,19 +60,19 @@ public class Account {
 
 
     //3
-//    public Save save()   {
-//        return new AccSave();
-//    }
-//
-//    private class AccSave implements Save {
-//        private String name = Account.this.name;
-//        private Map<Currency, Integer> values = new HashMap<>(Account.this.values);
-//        public void load() {
-//            Account.this.name = name;
-//            Account.this.values.clear();
-//            Account.this.values.putAll(values);
-//        }
-//    }
+    public Save save()   {
+        return new AccSave();
+    }
+
+    private class AccSave implements Save {
+        private String name = Account.this.name;
+        private final Map<Currency, Integer> values = new HashMap<>(Account.this.values);
+        public void load() {
+            Account.this.name = name;
+            Account.this.values.clear();
+            Account.this.values.putAll(values);
+        }
+    }
 
 
 }

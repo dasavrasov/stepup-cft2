@@ -75,16 +75,20 @@ public class AccountTests {
     }
 
     //Задание 3 - сохранение снапшота
-//    @Test
-//    @DisplayName("Тест сохранения снапшота")
-//    public void TestSaveToSnapshot(){
-//        Account account = new Account("Иванов Иван Иванович");
-//        //добавили 100 рублей
-//        account.changeCurrencyAmount(Currency.RUB, 100);
-//        AccountSnapshot shapshot1 = account.saveToSnapshot(); //сохранили снапшот
-//        //пробуем изменить shapshot1 - проверка на иммутабельность
+    @Test
+    @DisplayName("Тест сохранения снапшота")
+    public void TestSaveToSnapshot(){
+        Account account = new Account("Иванов Иван Иванович");
+        //добавили 100 рублей
+        account.changeCurrencyAmount(Currency.RUB, 100);
+        Save snapshot1 = account.save(); //сохранили снапшот
+        //пробуем изменить shapshot1 - проверка на иммутабельность
+        account.changeCurrencyAmount(Currency.RUB, 200); //изменение оригинального объекта не влияет на сохранение
+        snapshot1.load();
+        assertEquals (100,account.getValues().get(Currency.RUB));
+
 //        shapshot1.getValues().put(Currency.RUB, 200);
-//        assert (shapshot1.getValues().get(Currency.RUB) == 100);
+//        assertEquals (100,shapshot1.getValues().get(Currency.RUB));
 //        //Изменения оригинального объекта Account также не оказывают влияния на Сохранение
 //        account.changeCurrencyAmount(Currency.RUB, 300);
 //        assert (account.getValues().get(Currency.RUB) == 300);
@@ -99,5 +103,5 @@ public class AccountTests {
 //        assert (account.getValues().get(Currency.RUB) == 300);
 //        account.restoreFromSnapshot(shapshot1);
 //        assert (account.getValues().get(Currency.RUB) == 100);
-//    }
+    }
 }
