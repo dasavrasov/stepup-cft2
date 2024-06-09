@@ -46,7 +46,7 @@ public class Utils {
                 //проверка @Cache
                 if (method1.isAnnotationPresent(Cache.class)) {
 //                    System.out.println(method.getName() + " помечен аннотацией Cache");
-                    if (cache.isEmpty()) {
+                    if (!cache.containsKey(method1)) {
 //                        System.out.println("Первый вызов - запись в кэш " + method.getName());
                         result = method1.invoke(target, args); //первый вызов - выполняем
                         cache.put(method1, result); //запись в кэш
