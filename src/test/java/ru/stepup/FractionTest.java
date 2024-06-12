@@ -25,6 +25,7 @@ public class FractionTest implements Fractionable{
     @Override @Cache
     public double doubleValue() {
         count++;
+        System.out.println("Invoke doubleValue()");
         return (double) num / denum;
     }
 
