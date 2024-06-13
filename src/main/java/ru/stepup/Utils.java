@@ -103,7 +103,6 @@ class CacheClearer implements Runnable {
 public class Utils {
 
     public static Object cache(Object target) {
-
         class CacheHandler implements InvocationHandler {
             Object target;
             boolean stateChanged = true;
@@ -116,7 +115,7 @@ public class Utils {
                 this.target = target;
                 this.cacheClearer = new CacheClearer(cache);
                 this.scheduler = Executors.newScheduledThreadPool(1);
-                scheduler.scheduleAtFixedRate(cacheClearer, 500, 500, TimeUnit.MILLISECONDS);
+                scheduler.scheduleAtFixedRate(cacheClearer, 1000, 1000, TimeUnit.MILLISECONDS);
             }
 
             @Override

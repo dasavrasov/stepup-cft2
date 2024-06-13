@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.concurrent.TimeUnit;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CacheHandlerTest{
@@ -53,7 +55,7 @@ public class CacheHandlerTest{
         res3=cachedFraction.doubleValue();
         System.out.println("res3="+res3);
         System.out.println(System.currentTimeMillis());
-        Thread.sleep(5000);
+        Thread.sleep(1500);
         System.out.println(System.currentTimeMillis());
         res3=cachedFraction.doubleValue();
         System.out.println("res3="+res3);
