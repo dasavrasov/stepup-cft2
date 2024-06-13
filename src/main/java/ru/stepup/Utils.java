@@ -6,6 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
@@ -107,11 +110,13 @@ public class Utils {
 
             final Map<State, CacheValue> cache = new HashMap<>();
             final CacheClearer cacheClearer;
+            final ScheduledExecutorService scheduler;
 
             public CacheHandler(Object target) {
                 this.target = target;
                 this.cacheClearer = new CacheClearer(cache);
-                new Thread(cacheClearer).start();
+                this.scheduler = Executors.newScheduledThreadPool(1);
+                scheduler.scheduleAtFixedRate(cacheClearer, 500, 500, TimeUnit.MILLISECONDS);
             }
 
             @Override
