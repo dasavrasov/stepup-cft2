@@ -1,5 +1,6 @@
 package ru.stepup;
 
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,7 @@ public class CacheHandlerTest{
         assertEquals(1.6666666666666667, res); //0.6666666666666666
     }
 
+    @SneakyThrows
     @Test // ПРоверяем что значение берется из кеша
     void cacheTest(){
         double res1, res2, res3;
@@ -46,6 +48,13 @@ public class CacheHandlerTest{
         res2=cachedFraction.doubleValue();
         System.out.println("res2="+res2);
         cachedFraction.setNum(2);
+        res3=cachedFraction.doubleValue();
+        System.out.println("res3="+res3);
+        res3=cachedFraction.doubleValue();
+        System.out.println("res3="+res3);
+        System.out.println(System.currentTimeMillis());
+        Thread.sleep(5000);
+        System.out.println(System.currentTimeMillis());
         res3=cachedFraction.doubleValue();
         System.out.println("res3="+res3);
         res3=cachedFraction.doubleValue();

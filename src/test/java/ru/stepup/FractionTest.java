@@ -22,7 +22,7 @@ public class FractionTest implements Fractionable{
         this.denum = denum;
     }
 
-    @Override @Cache
+    @Override @Cache(expiration = 1000)
     public double doubleValue() {
         count++;
         System.out.println("Invoke doubleValue()");

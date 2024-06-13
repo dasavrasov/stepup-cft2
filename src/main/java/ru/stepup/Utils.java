@@ -15,6 +15,7 @@ import java.util.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 @interface Cache {
+    long expiration() default 0;
 }
 
 class State {
@@ -63,6 +64,39 @@ class State {
 
 }
 
+class CacheValue {
+    private final Object value;
+    private final long expirationTime;
+
+    public CacheValue(Object value, long expirationTime) {
+        this.value = value;
+        this.expirationTime = expirationTime;
+    }
+
+    public Object getValue() {
+        return value;
+    }
+
+    public long getExpirationTime() {
+        return expirationTime;
+    }
+}
+
+class CacheClearer implements Runnable {
+    private final Map<State, CacheValue> cache;
+
+    public CacheClearer(Map<State, CacheValue> cache) {
+        this.cache = cache;
+    }
+
+    @Override
+    public void run() {
+        long currentTime = System.currentTimeMillis();
+        System.out.println("CacheClearer started");
+        cache.entrySet().removeIf(entry -> entry.getValue().getExpirationTime() <= currentTime);
+    }
+}
+
 public class Utils {
 
     public static Object cache(Object target) {
@@ -71,10 +105,13 @@ public class Utils {
             Object target;
             boolean stateChanged = true;
 
-            final Map<State, Object> cache = new HashMap<>();
+            final Map<State, CacheValue> cache = new HashMap<>();
+            final CacheClearer cacheClearer;
 
             public CacheHandler(Object target) {
                 this.target = target;
+                this.cacheClearer = new CacheClearer(cache);
+                new Thread(cacheClearer).start();
             }
 
             @Override
@@ -84,21 +121,22 @@ public class Utils {
                 Class clazz = target.getClass();
                 Method method1 = clazz.getMethod(method.getName(), method.getParameterTypes());
                 if (method1.isAnnotationPresent(Mutator.class)) {
-                        stateChanged = true;
+                    stateChanged = true;
                 }
                 if (method1.isAnnotationPresent(Cache.class)) {
+                    long expiration = method1.getAnnotation(Cache.class).expiration();
                     if (stateChanged) {
                         State newState = new State(target);
                         if (!cache.containsKey(newState)) {
                             result = method1.invoke(target, args);
-                            cache.put(new State(target), result);
+                            cache.put(new State(target), new CacheValue(result, System.currentTimeMillis() + expiration));
                             stateChanged = false;
                             return result;
                         }
                     }
-                    result = cache.get(new State(target));
-                    if (result != null) {
-                        return result;
+                    CacheValue cacheValue = cache.get(new State(target));
+                    if (cacheValue != null) {
+                        return cacheValue.getValue();
                     }
                 }
                 return method1.invoke(target, args);
@@ -107,4 +145,5 @@ public class Utils {
 
         return Proxy.newProxyInstance(target.getClass().getClassLoader(), target.getClass().getInterfaces(), new CacheHandler(target));
     }
+
 }
