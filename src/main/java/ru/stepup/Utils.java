@@ -4,10 +4,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,18 +21,8 @@ import java.util.stream.Collectors;
 class State {
     private final List<Object> state=new ArrayList<>();
 
-    public State(Object target) {
-        Field[] fields= target.getClass().getDeclaredFields();
-
-        state.clear();
-        for (Field field : fields) {
-            field.setAccessible(true);
-            try {
-                state.add(field.get(target));
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        }
+    public List<Object> getState() {
+        return state;
     }
 
     @Override
@@ -43,13 +30,38 @@ class State {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         State state1 = (State) o;
-        return Objects.equals(state, state1.state);
+        //сравнить 2 листа по значениям
+        if (state.size()!=state1.getState().size())
+            return false;
+        for(int i=0;i<state.size();i++){
+            if (!state.get(i).equals(state1.getState().get(i)))
+                return false;
+        }
+        return true;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(state);
     }
+
+    public State(Object target) {
+        Field[] fields= target.getClass().getDeclaredFields();
+
+        state.clear();
+        for (Field field : fields) {
+            field.setAccessible(true);
+            if (Modifier.isStatic(field.getModifiers()))
+                continue; //статческие поля нельзя кэшировать
+            try {
+                state.add(field.get(target));
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
 }
 
 public class Utils {
@@ -73,17 +85,17 @@ public class Utils {
                 Class clazz = target.getClass();
                 Method method1 = clazz.getMethod(method.getName(), method.getParameterTypes());
                 if (method1.isAnnotationPresent(Mutator.class)) {
-                    State newState = new State(target);
-                    if (!cache.containsKey(newState)) {
                         stateChanged = true;
-                    }
                 }
                 if (method1.isAnnotationPresent(Cache.class)) {
-                    if (cache.isEmpty() || stateChanged) {
-                        result = method1.invoke(target, args);
-                        cache.put(new State(target), result);
-                        stateChanged = false;
-                        return result;
+                    if (stateChanged) {
+                        State newState = new State(target);
+                        if (!cache.containsKey(newState)) {
+                            result = method1.invoke(target, args);
+                            cache.put(new State(target), result);
+                            stateChanged = false;
+                            return result;
+                        }
                     }
                     result = cache.get(new State(target));
                     if (result != null) {
