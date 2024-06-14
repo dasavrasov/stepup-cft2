@@ -40,37 +40,35 @@ public class CacheHandlerTest{
 
         res1=cachedFraction.doubleValue(); //Invoke doubleValue()
         System.out.println("res1="+res1);
+        assertEquals(1,FractionTest.count);
 //        assertEquals(1,FractionTest.count);
         res1=cachedFraction.doubleValue();
         System.out.println("res1="+res1);
+        assertEquals(1,FractionTest.count);
 //        assertEquals(1,FractionTest.count);
         cachedFraction.setNum(5);
         res2=cachedFraction.doubleValue();
         System.out.println("res1="+res2);
+        assertEquals(2,FractionTest.count);
         res2=cachedFraction.doubleValue();
         System.out.println("res2="+res2);
+        assertEquals(2,FractionTest.count);
         cachedFraction.setNum(2);
         res3=cachedFraction.doubleValue();
         System.out.println("res3="+res3);
+        assertEquals(2,FractionTest.count);
         res3=cachedFraction.doubleValue();
         System.out.println("res3="+res3);
+        assertEquals(2,FractionTest.count);
         System.out.println(System.currentTimeMillis());
-        Thread.sleep(1500);
+        Thread.sleep(2500);
         System.out.println(System.currentTimeMillis());
         res3=cachedFraction.doubleValue();
         System.out.println("res3="+res3);
+        assertEquals(3,FractionTest.count);
         res3=cachedFraction.doubleValue();
         System.out.println("res3="+res3);
-
-//        res3=cachedFraction.doubleValue(); //Invoke doubleValue()
-//        System.out.println("res3="+res3);
-//        assertEquals(1,FractionTest.count);
-//        assertEquals(res1, res2, res3); //0.6666666666666666
-//        cachedFraction.setDenum(2);
-//        res3=cachedFraction.doubleValue(); //Invoke doubleValue()
-//        System.out.println("res3="+res3);
-//        assertEquals(res1, res2, res3); //0.6666666666666666
-
+        assertEquals(3,FractionTest.count);
     }
 
     @Test // ПРоверяем что кеш очищается
