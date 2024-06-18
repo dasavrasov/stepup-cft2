@@ -1,10 +1,8 @@
-package ru.stepup.stepup_cft2;
+package ru.stepup;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-
-import java.io.File;
 
 @SpringBootApplication
 public class StepupCft2Application {

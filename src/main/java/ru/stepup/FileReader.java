@@ -1,4 +1,4 @@
-package ru.stepup.stepup_cft2;
+package ru.stepup;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
