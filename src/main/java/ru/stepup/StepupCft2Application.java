@@ -17,9 +17,12 @@ public class StepupCft2Application {
 		FileReader fileReader = context.getBean(FileReader.class);
 		List<String> lines=fileReader.readFile();
 		DatabaseWriter databaseWriter = context.getBean(DatabaseWriter.class);
-		databaseWriter.saveData(lines);
+		databaseWriter.loadData(lines);
 		DatabaseReader databaseReader = context.getBean(DatabaseReader.class);
-		databaseReader.readData();
+		List<User> users=databaseReader.readUser();
+		users.forEach(user -> System.out.println(user.getUsername()+" "+user.getFio()));
+		List<Login> logins=databaseReader.readLogin();
+		logins.forEach(login -> System.out.println(login.getUserId()+" "+login.getApplication()+" "+login.getAccessDate()));
 	}
 
 }

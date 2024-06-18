@@ -25,7 +25,7 @@ public class DatabaseWriter {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public void saveData(List<String> lines) {
+    public void loadData(List<String> lines) {
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
         for (String line : lines) {
             String[] data = line.split(";");
@@ -38,5 +38,13 @@ public class DatabaseWriter {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void updateUser(User user) {
+        jdbcTemplate.update("UPDATE users SET username = ?, fio = ? WHERE id = ?", user.getUsername(), user.getFio(), user.getId());
+    }
+
+    public void updateLogin(Login login) {
+        jdbcTemplate.update("UPDATE logins SET access_date = ?, user_id = ?, application = ? WHERE id = ?", login.getAccessDate(), login.getUserId(), login.getApplication(), login.getId());
     }
 }
