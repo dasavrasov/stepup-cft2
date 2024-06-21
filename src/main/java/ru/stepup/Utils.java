@@ -6,9 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.*;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
@@ -22,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 }
 
 class State {
-    private final List<Object> state=new ArrayList<>();
+    private final List<Object> state=new CopyOnWriteArrayList<>();
 
     public List<Object> getState() {
         return state;
@@ -105,9 +104,9 @@ public class Utils {
     public static Object cache(Object target) {
         class CacheHandler implements InvocationHandler {
             Object target;
-            boolean stateChanged = true;
+            AtomicBoolean stateChanged = new AtomicBoolean(true);
 
-            final Map<State, CacheValue> cache = new HashMap<>();
+            final Map<State, CacheValue> cache = new ConcurrentHashMap<>();
             final CacheClearer cacheClearer;
             final ScheduledExecutorService scheduler;
 
@@ -125,16 +124,16 @@ public class Utils {
                 Class clazz = target.getClass();
                 Method method1 = clazz.getMethod(method.getName(), method.getParameterTypes());
                 if (method1.isAnnotationPresent(Mutator.class)) {
-                    stateChanged = true;
+                    stateChanged.set(true);
                 }
                 if (method1.isAnnotationPresent(Cache.class)) {
                     long expiration = method1.getAnnotation(Cache.class).expiration();
-                    if (stateChanged) {
+                    if (stateChanged.get()) {
                         State newState = new State(target);
                         if (!cache.containsKey(newState)) {
                             result = method1.invoke(target, args);
-                            cache.put(new State(target), new CacheValue(result, System.currentTimeMillis() + expiration));
-                            stateChanged = false;
+                            cache.putIfAbsent(new State(target), new CacheValue(result, System.currentTimeMillis() + expiration));
+                            stateChanged.set(false);
                             return result;
                         }
                     }
