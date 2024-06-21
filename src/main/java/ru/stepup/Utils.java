@@ -108,13 +108,14 @@ public class Utils {
 
             final Map<State, CacheValue> cache = new ConcurrentHashMap<>();
             final CacheClearer cacheClearer;
-            final ScheduledExecutorService scheduler;
+            final ExecutorService scheduler;
+
+            private static final int CACHE_SIZE_THRESHOLD = 2; //размер кеша при которм запускать чистку
 
             public CacheHandler(Object target) {
                 this.target = target;
                 this.cacheClearer = new CacheClearer(cache);
-                this.scheduler = Executors.newScheduledThreadPool(1);
-                scheduler.scheduleAtFixedRate(cacheClearer, 1000, 1000, TimeUnit.MILLISECONDS);
+                this.scheduler = Executors.newCachedThreadPool();
             }
 
             @Override
@@ -134,6 +135,9 @@ public class Utils {
                             result = method1.invoke(target, args);
                             cache.putIfAbsent(new State(target), new CacheValue(result, System.currentTimeMillis() + expiration));
                             stateChanged.set(false);
+                            if (cache.size() >= CACHE_SIZE_THRESHOLD) {
+                                scheduler.submit(cacheClearer); // запускаем чистку кеша
+                            }
                             return result;
                         }
                     }
