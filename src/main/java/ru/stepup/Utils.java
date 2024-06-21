@@ -94,8 +94,17 @@ class CacheClearer implements Runnable {
     @Override
     public void run() {
         long currentTime = System.currentTimeMillis();
-        System.out.println("CacheClearer started");
-        cache.entrySet().removeIf(entry -> entry.getValue().getExpirationTime() <= currentTime);
+        long cSize=cache.size();
+//        System.out.println("CacheClearer started with size="+cSize);
+        cache.entrySet().removeIf(entry -> {
+//            System.out.println("Expiration time: " + entry.getValue().getExpirationTime() + ", Current time: " + currentTime);
+            if (entry.getValue().getExpirationTime() <= currentTime) {
+                return true;
+            }
+            return false;
+        });
+//        cSize=cache.size();
+//        System.out.println("CacheClearer ended with size="+cSize);
     }
 }
 
@@ -115,7 +124,7 @@ public class Utils {
             public CacheHandler(Object target) {
                 this.target = target;
                 this.cacheClearer = new CacheClearer(cache);
-                this.scheduler = Executors.newCachedThreadPool();
+                this.scheduler = Executors.newSingleThreadExecutor();
             }
 
             @Override
@@ -128,6 +137,9 @@ public class Utils {
                     stateChanged.set(true);
                 }
                 if (method1.isAnnotationPresent(Cache.class)) {
+                    if (cache.size() >= CACHE_SIZE_THRESHOLD) {
+                        scheduler.submit(cacheClearer); // запускаем чистку кеша
+                    }
                     long expiration = method1.getAnnotation(Cache.class).expiration();
                     if (stateChanged.get()) {
                         State newState = new State(target);
@@ -135,9 +147,6 @@ public class Utils {
                             result = method1.invoke(target, args);
                             cache.putIfAbsent(new State(target), new CacheValue(result, System.currentTimeMillis() + expiration));
                             stateChanged.set(false);
-                            if (cache.size() >= CACHE_SIZE_THRESHOLD) {
-                                scheduler.submit(cacheClearer); // запускаем чистку кеша
-                            }
                             return result;
                         }
                     }

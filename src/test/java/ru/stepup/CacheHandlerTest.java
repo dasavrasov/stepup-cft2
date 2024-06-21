@@ -54,9 +54,9 @@ public class CacheHandlerTest{
         System.out.println("res3="+res3);
         res3=cachedFraction.doubleValue();
         System.out.println("res3="+res3);
-        System.out.println(System.currentTimeMillis());
-        Thread.sleep(1500);
-        System.out.println(System.currentTimeMillis());
+        System.out.println("begore sleep "+System.currentTimeMillis());
+        Thread.sleep(5000);
+        System.out.println("after sleep "+System.currentTimeMillis());
         res3=cachedFraction.doubleValue();
         System.out.println("res3="+res3);
         res3=cachedFraction.doubleValue();
