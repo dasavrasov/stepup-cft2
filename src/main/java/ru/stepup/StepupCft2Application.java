@@ -3,8 +3,6 @@ package ru.stepup;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -15,13 +13,22 @@ public class StepupCft2Application {
 
 		ConfigurableApplicationContext context=SpringApplication.run(StepupCft2Application.class, args);
 		FileReader fileReader = context.getBean(FileReader.class);
-		List<String> lines=fileReader.readFile();
+		fileReader.readFile();
+		fileReader.convertToUsers();
+		fileReader.convertToLogins();
+		Checker<User> fioChecker = context.getBean(FioChecker.class);
+		List<User> users=fioChecker.check(fileReader.getUsers());
+		Checker<Login> applicationTypeChecker = context.getBean(ApplicationTypeChecker.class);
+		List<Login> logins=applicationTypeChecker.check(fileReader.getLogins());
+		Checker<Login> accessDateChecker = context.getBean(AccessDateChecker.class);
+		logins=accessDateChecker.check(logins);
 		DatabaseWriter databaseWriter = context.getBean(DatabaseWriter.class);
-		databaseWriter.loadData(lines);
+		databaseWriter.writeUsers(users);
+		databaseWriter.writeLogins(logins);
 		DatabaseReader databaseReader = context.getBean(DatabaseReader.class);
-		List<User> users=databaseReader.readUser();
+		users=databaseReader.readAllUsers();
 		users.forEach(user -> System.out.println(user.getUsername()+" "+user.getFio()));
-		List<Login> logins=databaseReader.readLogin();
+		logins=databaseReader.readAllLogins();
 		logins.forEach(login -> System.out.println(login.getUserId()+" "+login.getApplication()+" "+login.getAccessDate()));
 	}
 

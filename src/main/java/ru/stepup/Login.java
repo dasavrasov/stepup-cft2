@@ -11,7 +11,7 @@ import java.sql.Date;
 @Setter
 public class Login {
     private long id;
-    private String userId;
+    private long userId;
     private String application;
     private Date accessDate;
 }

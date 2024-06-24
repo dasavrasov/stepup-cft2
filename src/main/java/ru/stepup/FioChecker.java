@@ -1,24 +1,17 @@
 package ru.stepup;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-public class FioChecker {
-    @Autowired
-    private DatabaseReader databaseReader;
-
-    @Autowired
-    private DatabaseWriter databaseWriter;
-
-    public void check() {
-        List<User> users = databaseReader.readUser();
-        for (User user : users) {
-            String fio = user.getFio();
-            if (!Character.isUpperCase(fio.charAt(0))) {
-                user.setFio(fio.substring(0, 1).toUpperCase() + fio.substring(1));
-                databaseWriter.updateUser(user);
+@Component
+public class FioChecker implements Checker<User>{
+    public List<User> check(List<User> users) {
+        users.forEach(user -> {
+            if (!Character.isUpperCase(user.getFio().charAt(0))) {
+                user.setFio(user.getFio().substring(0, 1).toUpperCase() + user.getFio().substring(1));
             }
-        }
+        });
+        return users;
     }
 }

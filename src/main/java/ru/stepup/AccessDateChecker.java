@@ -1,22 +1,25 @@
 package ru.stepup;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class AccessDateChecker {
-    @Autowired
-    private DatabaseReader databaseReader;
+@Component
+public class AccessDateChecker implements Checker<Login>{
 
-    @Autowired
-    private DatabaseWriter databaseWriter;
+    private static final Logger logger = LoggerFactory.getLogger(AccessDateChecker.class);
 
-    public void check() {
-        List<Login> logins = databaseReader.readLogin();
-        for (Login login : logins) {
-            if (login.getAccessDate() == null) {
-                System.out.println("Access date is null for login with id " + login.getId());
-            }
-        }
+    public List<Login> check(List<Login> logins) {
+        return logins.stream()
+                .peek(login -> {
+                    if (login.getAccessDate() == null) {
+                        logger.error("Поле access_date пустое " + login.getId());
+                    }
+                })
+                .filter(login -> login.getAccessDate() != null)
+                .collect(Collectors.toList());
     }
 }

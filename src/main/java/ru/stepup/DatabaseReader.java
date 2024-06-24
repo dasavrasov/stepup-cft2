@@ -2,7 +2,6 @@ package ru.stepup;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
@@ -16,13 +15,13 @@ public class DatabaseReader {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public List<User> readUser() {
+    public List<User> readAllUsers() {
         String usersSql = "SELECT id,username,fio FROM users";
         List<User> users = jdbcTemplate.query(usersSql, new UserRowMapper());
         return users;
     }
 
-    public List<Login> readLogin() {
+    public List<Login> readAllLogins() {
         String loginsSql = "SELECT id,user_id,application,access_date FROM logins";
         List<Login> logins = jdbcTemplate.query(loginsSql, new LoginRowMapper());
         return logins;
@@ -39,7 +38,7 @@ public class DatabaseReader {
     class LoginRowMapper implements RowMapper<Login> {
         @Override
         public Login mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Login login = new Login(rs.getLong("id"), rs.getString("user_id"), rs.getString("application"), rs.getDate("access_date"));
+            Login login = new Login(rs.getLong("id"), rs.getLong("user_id"), rs.getString("application"), rs.getDate("access_date"));
             return login;
         }
     }
