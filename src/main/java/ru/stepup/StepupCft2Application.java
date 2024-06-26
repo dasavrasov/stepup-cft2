@@ -14,8 +14,8 @@ public class StepupCft2Application {
 		ConfigurableApplicationContext context=SpringApplication.run(StepupCft2Application.class, args);
 		FileReader fileReader = context.getBean(FileReader.class);
 		fileReader.readFile();
-		fileReader.convertToUsers();
-		fileReader.convertToLogins();
+		fileReader.readUsers();
+		fileReader.readLogins();
 		Checker<User> fioChecker = context.getBean(FioChecker.class);
 		List<User> users=fioChecker.check(fileReader.getUsers());
 		Checker<Login> applicationTypeChecker = context.getBean(ApplicationTypeChecker.class);

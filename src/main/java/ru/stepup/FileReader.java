@@ -44,21 +44,21 @@ public class FileReader {
         }
     }
 
-    public void convertToUsers() {
+    public void readUsers() {
         for (String line : lines) {
             String[] data = line.split(";");
             users.add(new User(userIdCounter++, data[0], data[1]));
         }
     }
 
-    public void convertToLogins() {
+    public void readLogins() {
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
         for (String line : lines) {
             String[] data = line.split(";");
             Date sqlDate;
             try {
-                java.util.Date parsedDate = format.parse(data[2]);
-                sqlDate = new java.sql.Date(parsedDate.getTime());
+                Date parsedDate = format.parse(data[2]);
+                sqlDate = new Date(parsedDate.getTime());
             } catch (ParseException e) {
 //                e.printStackTrace();
                 sqlDate = null;

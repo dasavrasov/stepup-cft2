@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@LogTransformation
 public class AccessDateChecker implements Checker<Login>{
 
     private static final Logger logger = LoggerFactory.getLogger(AccessDateChecker.class);
