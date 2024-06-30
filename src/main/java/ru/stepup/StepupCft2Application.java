@@ -13,13 +13,13 @@ public class StepupCft2Application {
 
 		ConfigurableApplicationContext context=SpringApplication.run(StepupCft2Application.class, args);
 		FileReader fileReader = context.getBean(FileReader.class);
-		fileReader.readFile();
-		fileReader.readUsers();
-		fileReader.readLogins();
+		List<String> lines = fileReader.readFile();
+		List<User> users = fileReader.readUsers(lines);
+		List<Login> logins = fileReader.readLogins(lines, users);
 		Checker<User> fioChecker = context.getBean(FioChecker.class);
-		List<User> users=fioChecker.check(fileReader.getUsers());
+		users=fioChecker.check(users);
 		Checker<Login> applicationTypeChecker = context.getBean(ApplicationTypeChecker.class);
-		List<Login> logins=applicationTypeChecker.check(fileReader.getLogins());
+		logins=applicationTypeChecker.check(logins);
 		Checker<Login> accessDateChecker = context.getBean(AccessDateChecker.class);
 		logins=accessDateChecker.check(logins);
 		DatabaseWriter databaseWriter = context.getBean(DatabaseWriter.class);
@@ -33,4 +33,3 @@ public class StepupCft2Application {
 	}
 
 }
-

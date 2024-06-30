@@ -17,16 +17,8 @@ public class FileReader {
     @Value("${file.path}")
     private String filePath;
 
-    private long userIdCounter = 1;
-    private long loginIdCounter = 1;
-
-    private List<String> lines = new ArrayList<>();
-    @Getter
-    private List<User> users=new ArrayList<>();
-    @Getter
-    private List<Login> logins=new ArrayList<>();
-
-    public void readFile() {
+    public List<String> readFile() {
+        List<String> lines = new ArrayList<>();
         try {
             File folder = new File(filePath);
             if (folder.isDirectory()) {
@@ -42,17 +34,23 @@ public class FileReader {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        return lines;
     }
 
-    public void readUsers() {
+    public List<User> readUsers(List<String> lines) {
+        long userIdCounter = 1;
+        List<User> users = new ArrayList<>();
         for (String line : lines) {
             String[] data = line.split(";");
             users.add(new User(userIdCounter++, data[0], data[1]));
         }
+        return users;
     }
 
-    public void readLogins() {
+    public List<Login> readLogins(List<String> lines, List<User> users) {
+        long loginIdCounter = 1;
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+        List<Login> logins = new ArrayList<>();
         for (String line : lines) {
             String[] data = line.split(";");
             Date sqlDate;
@@ -66,5 +64,6 @@ public class FileReader {
             User user = users.stream().filter(u -> u.getUsername().equals(data[0])).findFirst().get();
             logins.add(new Login(loginIdCounter++, user.getId(), data[3],sqlDate));
         }
+        return logins;
     }
 }

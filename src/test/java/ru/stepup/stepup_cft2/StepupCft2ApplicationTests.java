@@ -56,11 +56,9 @@ class StepupCft2ApplicationTests {
 
 	@Test
 	void fileReaderTest() {
-		fileReader.readFile();
-		fileReader.readUsers();
-		List<User> users = fileReader.getUsers();
-		fileReader.readLogins();
-		List<Login> logins = fileReader.getLogins();
+		List<String> lines = fileReader.readFile();
+		List<User> users = fileReader.readUsers(lines);
+		List<Login> logins = fileReader.readLogins(lines, users);
 		assertEquals(5,users.size());
 		assertEquals(5,logins.size());
 		assertTrue(users.stream().anyMatch(user -> user.getFio().equals("Саврасов Денис Алексеевич")));
@@ -73,14 +71,12 @@ class StepupCft2ApplicationTests {
 
 	@Test
 	void checkerTest() {
-		fileReader.readFile();
-		fileReader.readUsers();
-		List<User> users = fileReader.getUsers();
-		users=fioChecker.check(fileReader.getUsers());
+		List<String> lines = fileReader.readFile();
+		List<User> users = fileReader.readUsers(lines);
+		users=fioChecker.check(users);
 		users.stream().forEach(user -> assertTrue(Character.isUpperCase(user.getFio().charAt(0))));
-		fileReader.readLogins();
-		List<Login> logins = fileReader.getLogins();
-		logins=applicationTypeChecker.check(fileReader.getLogins());
+		List<Login> logins = fileReader.readLogins(lines, users);
+		logins=applicationTypeChecker.check(logins);
 		assertTrue(logins.stream().allMatch(login -> login.getApplication().equals("web") || login.getApplication().equals("mobile") || login.getApplication().startsWith("other:")));
 		assertTrue(logins.stream().anyMatch(login -> login.getAccessDate() == null));
 		logins=accessDateChecker.check(logins);
@@ -89,11 +85,9 @@ class StepupCft2ApplicationTests {
 
 	@Test
 	void databaseWriterTest() {
-		fileReader.readFile();
-		fileReader.readUsers();
-		fileReader.readLogins();
-		List<User> users=fioChecker.check(fileReader.getUsers());
-		List<Login> logins=applicationTypeChecker.check(fileReader.getLogins());
+		List<String> lines = fileReader.readFile();
+		List<User> users = fileReader.readUsers(lines);
+		List<Login> logins = fileReader.readLogins(lines, users);
 		logins=accessDateChecker.check(logins);
 		databaseWriter.writeUsers(users);
 		databaseWriter.writeLogins(logins);
