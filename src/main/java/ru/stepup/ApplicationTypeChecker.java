@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
+@LogTransformation(logFile = "LOG/applicationTypeChecker.txt")
 public class ApplicationTypeChecker implements Checker<Login>{
 
     public List<Login> check(List<Login> logins) {
