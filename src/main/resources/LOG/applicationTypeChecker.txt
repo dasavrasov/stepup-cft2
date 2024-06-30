@@ -1,0 +1,3 @@
+Дата начала операции: 2024-06-30 12:27:54
+Компонент: applicationTypeChecker
+Входящие данные: ru.stepup.ApplicationTypeChecker@77aeba9b

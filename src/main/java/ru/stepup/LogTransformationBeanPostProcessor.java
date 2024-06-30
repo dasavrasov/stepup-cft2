@@ -6,6 +6,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.stereotype.Component;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -35,13 +37,13 @@ public class LogTransformationBeanPostProcessor implements BeanPostProcessor {
     public Object postProcessAfterInitialization(Object bean, String beanName) {
         if (beansWithLogFile.containsKey(beanName)) {
             String logFile = beansWithLogFile.get(beanName);
-            Logger logger = LoggerFactory.getLogger(bean.getClass());
-            logger.info("Дата начала операции", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-            logger.info("Компонент ", beanName);
-            logger.info("Входящие данные ", bean.toString());
-            System.out.println("Дата начала операции " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-            System.out.println("Компонент " + beanName);
-            System.out.println("Входящие данные " + bean.toString());
+            try (FileWriter writer = new FileWriter(logFile, true)) {
+                writer.write("Дата начала операции: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + "\n");
+                writer.write("Компонент: " + beanName + "\n");
+                writer.write("Входящие данные: " + bean.toString() + "\n");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             beansWithLogFile.remove(beanName);
         }
         return bean;

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-@LogTransformation(logFile = "LOG/fioChecker.txt")
+@LogTransformation(logFile = "src/main/resources/LOG/fioChecker.txt")
 public class FioChecker implements Checker<User>{
     public List<User> check(List<User> users) {
         users.forEach(user -> {
