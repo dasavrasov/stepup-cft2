@@ -10,7 +10,6 @@ import java.util.List;
 public class StepupCft2Application {
 
 	public static void main(String[] args) {
-
 		SpringApplication.run(StepupCft2Application.class, args);
 	}
 
