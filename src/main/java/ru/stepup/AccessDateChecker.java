@@ -2,6 +2,7 @@ package ru.stepup;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 
 @Component
 @LogTransformation(logFile = "src/main/resources/LOG/accessDateChecker.txt")
+@Order(1)
 public class AccessDateChecker implements Checker<Login>{
 
     private static final Logger logger = LoggerFactory.getLogger(AccessDateChecker.class);
