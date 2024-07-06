@@ -29,13 +29,9 @@ class StepupCft2ApplicationTests {
 	FileReader fileReader;
 
 	@Autowired
-	Checker<User> fioChecker;
-
+	List<Checker<User>> checkerUser;
 	@Autowired
-	Checker<Login> applicationTypeChecker;
-
-	@Autowired
-	Checker<Login> accessDateChecker;
+	List<Checker<Login>> checkerLogin;
 
 	@Autowired
 	DatabaseWriter databaseWriter;
@@ -73,13 +69,15 @@ class StepupCft2ApplicationTests {
 	void checkerTest() {
 		List<String> lines = fileReader.readFile();
 		List<User> users = fileReader.readUsers(lines);
-		users=fioChecker.check(users);
-		users.stream().forEach(user -> assertTrue(Character.isUpperCase(user.getFio().charAt(0))));
 		List<Login> logins = fileReader.readLogins(lines, users);
-		logins=applicationTypeChecker.check(logins);
+		for(Checker<User> fioChecker:checkerUser){
+			users=fioChecker.check(users);
+		}
+		for(Checker<Login> applicationTypeChecker:checkerLogin){
+			logins=applicationTypeChecker.check(logins);
+		}
+		users.stream().forEach(user -> assertTrue(Character.isUpperCase(user.getFio().charAt(0))));
 		assertTrue(logins.stream().allMatch(login -> login.getApplication().equals("web") || login.getApplication().equals("mobile") || login.getApplication().startsWith("other:")));
-		assertTrue(logins.stream().anyMatch(login -> login.getAccessDate() == null));
-		logins=accessDateChecker.check(logins);
 		assertTrue(logins.stream().noneMatch(login -> login.getAccessDate() == null));
 	}
 
@@ -88,7 +86,6 @@ class StepupCft2ApplicationTests {
 		List<String> lines = fileReader.readFile();
 		List<User> users = fileReader.readUsers(lines);
 		List<Login> logins = fileReader.readLogins(lines, users);
-		logins=accessDateChecker.check(logins);
 		databaseWriter.writeUsers(users);
 		databaseWriter.writeLogins(logins);
 		List<User> usersFromDb = databaseReader.readAllUsers();

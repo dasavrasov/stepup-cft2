@@ -29,3 +29,13 @@
 2024-07-03T16:39:03.817+03:00 ERROR 17620 --- [stepup-cft2] [main] ru.stepup.AccessDateChecker              : Поле access_date пустое 5
 2024-07-06T14:42:27.014+03:00 ERROR 8564 --- [stepup-cft2] [main] ru.stepup.AccessDateChecker              : Поле access_date пустое 5
 2024-07-06T14:43:08.822+03:00 ERROR 5496 --- [stepup-cft2] [main] ru.stepup.AccessDateChecker              : Поле access_date пустое 5
+2024-07-06T14:48:35.467+03:00 ERROR 14928 --- [stepup-cft2] [main] ru.stepup.AccessDateChecker              : Поле access_date пустое 5
+2024-07-06T14:51:22.323+03:00 ERROR 15872 --- [stepup-cft2] [main] ru.stepup.AccessDateChecker              : Поле access_date пустое 5
+2024-07-06T14:58:35.361+03:00 ERROR 7916 --- [stepup-cft2] [main] ru.stepup.AccessDateChecker              : Поле access_date пустое 5
+2024-07-06T14:59:00.621+03:00 ERROR 5968 --- [stepup-cft2] [main] ru.stepup.AccessDateChecker              : Поле access_date пустое 5
+2024-07-06T14:59:01.465+03:00 ERROR 5968 --- [stepup-cft2] [main] ru.stepup.AccessDateChecker              : Поле access_date пустое 5
+2024-07-06T15:00:59.657+03:00 ERROR 15628 --- [stepup-cft2] [main] ru.stepup.AccessDateChecker              : Поле access_date пустое 5
+2024-07-06T15:01:00.622+03:00 ERROR 15628 --- [stepup-cft2] [main] ru.stepup.AccessDateChecker              : Поле access_date пустое 5
+2024-07-06T15:01:24.784+03:00 ERROR 11352 --- [stepup-cft2] [main] ru.stepup.AccessDateChecker              : Поле access_date пустое 5
+2024-07-06T15:01:50.850+03:00 ERROR 11180 --- [stepup-cft2] [main] ru.stepup.AccessDateChecker              : Поле access_date пустое 5
+2024-07-06T15:01:51.837+03:00 ERROR 11180 --- [stepup-cft2] [main] ru.stepup.AccessDateChecker              : Поле access_date пустое 5
