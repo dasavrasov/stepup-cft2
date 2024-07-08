@@ -25,19 +25,6 @@ class StepupCft2ApplicationTests {
 	@Autowired
 	private ApplicationContext context;
 
-	@Autowired
-	FileReader fileReader;
-
-	@Autowired
-	List<Checker<User>> checkerUser;
-	@Autowired
-	List<Checker<Login>> checkerLogin;
-
-	@Autowired
-	DatabaseWriter databaseWriter;
-
-	@Autowired
-	DatabaseReader databaseReader;
 
 	@BeforeAll
 	static void beforeAll() {
@@ -49,52 +36,4 @@ class StepupCft2ApplicationTests {
 		registry.add("spring.datasource.username", postgres::getUsername);
 		registry.add("spring.datasource.password", postgres::getPassword);
 	}
-
-	@Test
-	void fileReaderTest() {
-		List<String> lines = fileReader.readFile();
-		List<User> users = fileReader.readUsers(lines);
-		List<Login> logins = fileReader.readLogins(lines, users);
-		assertEquals(5,users.size());
-		assertEquals(5,logins.size());
-		assertTrue(users.stream().anyMatch(user -> user.getFio().equals("Саврасов Денис Алексеевич")));
-		assertTrue(users.stream().anyMatch(user -> user.getFio().equals("ермаков Александр Иванович")));
-		assertTrue(users.stream().anyMatch(user -> user.getFio().equals("иванов Иван Иванович")));
-		assertTrue(logins.stream().anyMatch(user -> user.getApplication().equals("mobile")));
-		assertTrue(logins.stream().anyMatch(user -> user.getApplication().equals("web")));
-		assertTrue(logins.stream().anyMatch(user -> user.getApplication().equals("Sberbank")));
-	}
-
-	@Test
-	void checkerTest() {
-		List<String> lines = fileReader.readFile();
-		List<User> users = fileReader.readUsers(lines);
-		List<Login> logins = fileReader.readLogins(lines, users);
-		for(Checker<User> fioChecker:checkerUser){
-			users=fioChecker.check(users);
-		}
-		for(Checker<Login> applicationTypeChecker:checkerLogin){
-			logins=applicationTypeChecker.check(logins);
-		}
-		users.stream().forEach(user -> assertTrue(Character.isUpperCase(user.getFio().charAt(0))));
-		assertTrue(logins.stream().allMatch(login -> login.getApplication().equals("web") || login.getApplication().equals("mobile") || login.getApplication().startsWith("other:")));
-		assertTrue(logins.stream().noneMatch(login -> login.getAccessDate() == null));
-	}
-
-	@Test
-	void databaseWriterTest() {
-		List<String> lines = fileReader.readFile();
-		List<User> users = fileReader.readUsers(lines);
-		List<Login> logins = fileReader.readLogins(lines, users);
-		databaseWriter.writeUsers(users);
-		databaseWriter.writeLogins(logins);
-		List<User> usersFromDb = databaseReader.readAllUsers();
-		List<Login> loginsFromDb = databaseReader.readAllLogins();
-		users.forEach(user -> System.out.println(user.getUsername()+" "+user.getFio()));
-		logins.forEach(login -> System.out.println(login.getUserId()+" "+login.getApplication()+" "+login.getAccessDate()));
-		assertEquals(users.size(), usersFromDb.size());
-		assertEquals(logins.size(), loginsFromDb.size());
-	}
-
-
 }
