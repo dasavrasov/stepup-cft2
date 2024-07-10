@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.stepup.model.InstanceRequest;
+import ru.stepup.model.InstanceResponse;
 import ru.stepup.model.Product;
 import ru.stepup.service.ProductService;
 
@@ -22,8 +24,8 @@ public class ProductController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
-        Product createdProduct = productService.createProduct(product);
-        return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
+    public ResponseEntity<InstanceResponse> createInstance(@RequestBody InstanceRequest request) {
+        InstanceResponse response = productService.createInstance(request);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }
