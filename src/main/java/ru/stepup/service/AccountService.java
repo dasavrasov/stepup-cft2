@@ -23,8 +23,8 @@ public class AccountService {
 
     public ProductRegistryResponse createInstance(ProductRegistryRequest request) throws Exception {
         // Шаг 2
-        ProductRegister existingProductRegister = productRegisterRepository.findByProductIdAndType(request.getInstanceId(), request.getRegistryTypeCode());
-        if (existingProductRegister != null) {
+        ProductRegister productRegister = productRegisterRepository.findByProductIdAndProductRegisterType_Value(request.getInstanceId(), request.getRegistryTypeCode());
+        if (productRegister != null) {
             throw new Exception("Параметр " + request.getRegistryTypeCode() + " тип регистра " + request.getRegistryTypeCode() + " уже существует для ЭП с ИД " + request.getInstanceId());
         }
 
