@@ -9,7 +9,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class InstanceResponse {
+public class ProductInstanceResponse {
 
     @JsonProperty("data")
     private Data data;

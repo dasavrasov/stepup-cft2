@@ -1,6 +1,7 @@
 package ru.stepup.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,29 +9,30 @@ import java.util.List;
 
 @Getter
 @Setter
-public class InstanceRequest {
+public class ProductInstanceRequest {
 
     @JsonProperty("instanceId")
     private Integer instanceId;
 
+    @NotNull
     @JsonProperty("productType")
     private String productType;
-
+    @NotNull
     @JsonProperty("productCode")
     private String productCode;
-
+    @NotNull
     @JsonProperty("registerType")
     private String registerType;
-
+    @NotNull
     @JsonProperty("mdmCode")
     private String mdmCode;
-
+    @NotNull
     @JsonProperty("contractNumber")
     private String contractNumber;
-
+    @NotNull
     @JsonProperty("contractDate")
     private String contractDate;
-
+    @NotNull
     @JsonProperty("priority")
     private Integer priority;
 
@@ -54,13 +56,13 @@ public class InstanceRequest {
 
     @JsonProperty("technicalOverdraftLimitAmount")
     private Double technicalOverdraftLimitAmount;
-
+    @NotNull
     @JsonProperty("contractId")
     private Integer contractId;
-
+    @NotNull
     @JsonProperty("BranchCode")
     private String branchCode;
-
+    @NotNull
     @JsonProperty("IsoCurrencyCode")
     private String isoCurrencyCode;
 
@@ -114,10 +116,10 @@ public class InstanceRequest {
 
         @JsonProperty("shedulerJobId")
         private Integer shedulerJobId;
-
+        @NotNull
         @JsonProperty("Number")
         private String number;
-
+        @NotNull
         @JsonProperty("openingDate")
         private String openingDate;
 

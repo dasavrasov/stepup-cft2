@@ -10,6 +10,8 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://corporate_settlement_db:5432/postgres
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=12345
+    networks:
+      - appnetwork
     depends_on:
       - corporate_settlement_db
   corporate_settlement_db:
@@ -20,3 +22,8 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=12345
+    networks:
+      - appnetwork
+networks:
+  appnetwork:
+    driver: bridge
