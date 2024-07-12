@@ -6,10 +6,13 @@ import ru.stepup.model.*;
 import ru.stepup.repository.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -32,22 +35,24 @@ public class ProductService {
     }
 
     public ProductInstanceResponse createInstance(ProductInstanceRequest request) throws Exception {
-
+        Product product = null;
+        List<ProductRegister> productRegisterList = new ArrayList<>();
+        List<Agreement> agreementList = new ArrayList<>();
         // Parse ProductInstanceRequest and map fields to model classes
         // Create and save entities
         if (request.getInstanceId()==null) {
             //создание ЭП
 
             //Шап 1.1 проверка tpp_product на дубли
-            Product product = productRepository.findByNumber(request.getContractNumber());
+            product = productRepository.findByNumber(request.getContractNumber());
             if (product != null) {
-                throw new Exception("Параметр " + request.getContractNumber() + " договора " + product.getNumber() + " уже существует для ЭП с ИД " + request.getInstanceId());
+                throw new Exception("Параметр " + request.getContractNumber() + " договора " + product.getNumber() + " уже существует для ЭП с ИД " + product.getId());
             }
             //Шаг 1.2 проверка таблицы ДС (agreement) на дубли
             for (int i = 0; i < request.getInstanceArrangement().size(); i++) {
                 Agreement agreement = agreementRepository.findByNumber(request.getInstanceArrangement().get(i).getNumber());
                 if (agreement != null) {
-                    throw new Exception("Параметр " + i + " Дополнительного соглашения (сделки) " + request.getInstanceArrangement().get(i).getNumber() + " уже существует для ЭП с ИД " + request.getInstanceId());
+                    throw new Exception("Параметр " + i + " Дополнительного соглашения (сделки) " + request.getInstanceArrangement().get(i).getNumber() + " уже существует для ЭП с ИД " + product.getId());
                 }
             }
             //Шаг 1.3 по КодуПродукта найти связанные записи в каталоге Типа регистра
@@ -67,7 +72,7 @@ public class ProductService {
             product.setPriority(request.getPriority().longValue());
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDateTime contractDate = LocalDateTime.parse(request.getContractDate(), formatter);
+            LocalDate contractDate = LocalDate.parse(request.getContractDate(), formatter);
             product.setDateOfConclusion(contractDate);
             product = productRepository.save(product);
             //Шаг 1.5 добавить строку в таблицу ПР (product_register)
@@ -76,6 +81,7 @@ public class ProductService {
                 productRegister.setProductId(product.getId().longValue());
                 productRegister.setProductRegisterType(existingProductRegisterTypes.get(i));
                 productRegister.setState("Открыт");
+                productRegisterList.add(productRegister);
                 productRegisterRepository.save(productRegister);
             }
         }
@@ -86,7 +92,7 @@ public class ProductService {
             if (!productOptional.isPresent()) {
                 throw new Exception("Экземпляр продукта с ID " + request.getInstanceId() + " не найден");
             }
-            Product product = productOptional.get();
+            product = productOptional.get();
             //Шаг 2.2 проверка таблицы ДС (agreement) на дубли
             for (int i = 0; i < request.getInstanceArrangement().size(); i++) {
                 Agreement agreement = agreementRepository.findByNumber(request.getInstanceArrangement().get(i).getNumber());
@@ -112,12 +118,30 @@ public class ProductService {
                 agreement.setCoefficient(BigDecimal.valueOf(request.getInstanceArrangement().get(i).getCoefficient()));
                 agreement.setMinimumInterestRate(BigDecimal.valueOf(request.getInstanceArrangement().get(i).getMinimumInterestRate()));
                 agreement.setMinimumInterestRateCoefficient(new BigDecimal(request.getInstanceArrangement().get(i).getMinimumInterestRateCoefficient()));
-
+                agreementList.add(agreement);
                 agreementRepository.save(agreement);
             }
         }
 
         ProductInstanceResponse response = new ProductInstanceResponse();
+        ProductInstanceResponse.Data responseData = new ProductInstanceResponse.Data();
+        if (product != null) {
+            responseData.setInstanceId(product.getId().toString());
+        }
+        if (productRegisterList != null && !productRegisterList.isEmpty()) {
+            List<String> registerIds = productRegisterList.stream()
+                    .map(productRegister -> productRegister.getId().toString())
+                    .collect(Collectors.toList());
+            responseData.setRegisterId(registerIds);
+        }
+        if (agreementList != null && !agreementList.isEmpty()) {
+            List<String> agreementIds = agreementList.stream()
+                    .map(agreement -> agreement.getId().toString())
+                    .collect(Collectors.toList());
+            responseData.setSupplementaryAgreementId(agreementIds);
+        }
+        response.setData(responseData);
+
         return response;
     }
 }

@@ -42,4 +42,5 @@ public class AccountController {
             errorMessage = ex.getMessage();
         }
         return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
-    }}
+    }
+}

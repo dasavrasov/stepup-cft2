@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "tpp_product")
@@ -34,13 +34,13 @@ public class Product {
     private Long priority;
 
     @Column(name = "date_of_conclusion")
-    private LocalDateTime dateOfConclusion;
+    private LocalDate dateOfConclusion;
 
     @Column(name = "start_date_time")
-    private LocalDateTime startDateTime;
+    private LocalDate startDate;
 
     @Column(name = "end_date_time")
-    private LocalDateTime endDateTime;
+    private LocalDate endDate;
 
     @Column(name = "days")
     private Long days;
