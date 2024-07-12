@@ -1,11 +1,12 @@
 package ru.stepup.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "agreement")
@@ -33,18 +34,18 @@ public class Agreement {
 
     @Column(name = "sheduler_job_id")
     private Long shedulerJobId;
-
+    @NotNull
     @Column(name = "number")
     private String number;
-
+    @NotNull
     @Column(name = "opening_date")
-    private LocalDateTime openingDate;
+    private LocalDate openingDate;
 
     @Column(name = "closing_date")
-    private LocalDateTime closingDate;
+    private LocalDate closingDate;
 
     @Column(name = "cancel_date")
-    private LocalDateTime cancelDate;
+    private LocalDate cancelDate;
 
     @Column(name = "validity_duration")
     private Long validityDuration;
@@ -56,7 +57,7 @@ public class Agreement {
     private String status;
 
     @Column(name = "interest_calculation_date")
-    private LocalDateTime interestCalculationDate;
+    private LocalDate interestCalculationDate;
 
     @Column(name = "interest_rate")
     private BigDecimal interestRate;
