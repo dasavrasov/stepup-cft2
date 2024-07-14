@@ -93,7 +93,9 @@ public class ProductService {
                     throw new RuntimeException(e);
                 }
                 productRegister.setProductRegisterType(existingProductRegisterTypes.get(i));
-                productRegister.setState("Открыт");
+                productRegister.setState("OPEN");
+//                Account account = new Account();
+//                productRegister.setAccount(account);
                 productRegisterList.add(productRegister);
                 productRegisterRepository.save(productRegister);
             }

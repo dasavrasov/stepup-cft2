@@ -22,8 +22,9 @@ public class ProductRegister {
     @JoinColumn(name = "type", referencedColumnName = "value", nullable = false)
     private ProductRegisterType productRegisterType;
 
-    @Column(name = "account")
-    private Long account;
+    @ManyToOne
+    @JoinColumn(name = "account")
+    private Account account;
 
     @Column(name = "currency_code")
     private String currencyCode;
