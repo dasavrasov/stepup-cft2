@@ -5,6 +5,6 @@ import ru.stepup.model.AccountPool;
 
 import java.util.List;
 
-public interface AccountPoolRepository extends JpaRepository<AccountPool, Integer> {
+public interface AccountPoolRepository extends JpaRepository<AccountPool, Long> {
     List<AccountPool> findByBranchCodeAndCurrencyCodeAndMdmCodeAndPriorityCodeAndRegistryTypeCode(String branchCode, String currencyCode, String mdmCode, String priorityCode, String registryTypeCode);
 }

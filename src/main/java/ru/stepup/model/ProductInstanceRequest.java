@@ -12,7 +12,7 @@ import java.util.List;
 public class ProductInstanceRequest {
 
     @JsonProperty("instanceId")
-    private Integer instanceId;
+    private Long instanceId;
 
     @NotNull
     @JsonProperty("productType")
@@ -34,7 +34,7 @@ public class ProductInstanceRequest {
     private String contractDate;
     @NotNull
     @JsonProperty("priority")
-    private Integer priority;
+    private Long priority;
 
     @JsonProperty("interestRatePenalty")
     private Double interestRatePenalty;
@@ -115,7 +115,7 @@ public class ProductInstanceRequest {
         private String arrangementType;
 
         @JsonProperty("shedulerJobId")
-        private Integer shedulerJobId;
+        private Long shedulerJobId;
         @NotNull
         @JsonProperty("Number")
         private String number;
@@ -130,7 +130,7 @@ public class ProductInstanceRequest {
         private String cancelDate;
 
         @JsonProperty("validityDuration")
-        private Integer validityDuration;
+        private Long validityDuration;
 
         @JsonProperty("cancellationReason")
         private String cancellationReason;

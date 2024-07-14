@@ -13,7 +13,7 @@ public class ProductRegister {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
     @Column(name = "product_id")
     private Long productId;
@@ -29,8 +29,9 @@ public class ProductRegister {
     @Column(name = "currency_code")
     private String currencyCode;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "state")
-    private String state;
+    private State state;
 
     @Column(name = "account_number")
     private String accountNumber;

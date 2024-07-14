@@ -1,19 +1,17 @@
 package ru.stepup.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 public class ProductRegistryRequest {
-    @NotNull
     @JsonProperty("instanceId")
-    private Integer instanceId;
+    private Long instanceId;
 
     @JsonProperty("sequence")
-    private Integer sequence;
+    private Long sequence;
 
     @JsonProperty("registryTypeCode")
     private String registryTypeCode;

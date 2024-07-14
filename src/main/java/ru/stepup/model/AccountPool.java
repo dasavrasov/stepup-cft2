@@ -13,7 +13,7 @@ public class AccountPool {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
     @Column(name = "branch_code")
     private String branchCode;

@@ -2,12 +2,12 @@ package ru.stepup.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.stepup.model.*;
 import ru.stepup.repository.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -23,18 +23,25 @@ public class ProductService {
     private final AgreementRepository agreementRepository;
     private final ProductClassRepository productClassRepository;
     private final ProductRegisterTypeRepository productRegisterTypeRepository;
+    private final AccountPoolRepository accountPoolRepository;
+    private final AccountRepository accountRepository;
     // other repositories
 
     @Autowired
-    public ProductService(ProductRepository productRepository, ProductRegisterRepository productRegisterRepository, AgreementRepository agreementRepository, ProductClassRepository productClassRepository, ProductRegisterTypeRepository productRegisterTypeRepository /*, other repositories */) {
+    private ProductRegisterService productRegisterService;
+
+    @Autowired
+    public ProductService(ProductRepository productRepository, ProductRegisterRepository productRegisterRepository, AgreementRepository agreementRepository, ProductClassRepository productClassRepository, ProductRegisterTypeRepository productRegisterTypeRepository, /*, other repositories */AccountPoolRepository accountPoolRepository, AccountRepository accountRepository) {
         this.productRepository = productRepository;
         this.productRegisterRepository = productRegisterRepository;
         this.agreementRepository = agreementRepository;
         this.productClassRepository = productClassRepository;
         this.productRegisterTypeRepository = productRegisterTypeRepository;
-        // initialize other repositories
+        this.accountPoolRepository = accountPoolRepository;
+        this.accountRepository = accountRepository;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public ProductInstanceResponse createInstance(ProductInstanceRequest request) throws Exception {
         Product product = null;
         List<ProductRegister> productRegisterList = new ArrayList<>();
@@ -58,8 +65,8 @@ public class ProductService {
             }
             //Шаг 1.3 по КодуПродукта найти связанные записи в каталоге Типа регистра
             ProductClass productClass = productClassRepository.findByValue(request.getProductCode());
-            List<ProductRegisterType> existingProductRegisterTypes = productRegisterTypeRepository.findByAccountTypeAndProductClass_Value("Клиентский", request.getProductCode());
-            if (productClass == null || existingProductRegisterTypes.isEmpty()) {
+            List<ProductRegisterType> productRegisterTypes = productRegisterTypeRepository.findByAccountTypeAndProductClass_Value("Клиентский", request.getProductCode());
+            if (productClass == null || productRegisterTypes.isEmpty()) {
                 throw new Exception("Код продукта " + request.getProductCode() + " не найден в Каталоге продуктов tpp_ref_product_class");
             }
             //Шаг 1.4 добавить строку в таблицу ЭП (product)
@@ -67,15 +74,15 @@ public class ProductService {
             product.setType(request.getProductType());
             product.setNumber(request.getContractNumber());
             try {
-                product.setProductCodeId(productClass.getInternalId().longValue());
+                product.setProductCodeId(productClass.getInternalId());
             } catch (Exception e) {
                 ;
             }
             product.setClientId(Long.parseLong(request.getMdmCode()));
-            product.setType(existingProductRegisterTypes.get(0).getAccountType());
+            product.setType(productRegisterTypes.get(0).getAccountType());
             product.setNumber(request.getContractNumber());
             try {
-                product.setPriority(request.getPriority().longValue());
+                product.setPriority(request.getPriority());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -85,19 +92,16 @@ public class ProductService {
             product.setDateOfConclusion(contractDate);
             product = productRepository.save(product);
             //Шаг 1.5 добавить строку в таблицу ПР (product_register)
-            for (int i = 0; i < existingProductRegisterTypes.size(); i++) {
-                ProductRegister productRegister = new ProductRegister();
-                try {
-                    productRegister.setProductId(product.getId().longValue());
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+            for (int i = 0; i < productRegisterTypes.size(); i++) {
+                ProductRegisterType productRegisterType = productRegisterTypes.get(i);
+                List<AccountPool> accountPools = accountPoolRepository.findByBranchCodeAndCurrencyCodeAndMdmCodeAndPriorityCodeAndRegistryTypeCode(request.getBranchCode(), request.getIsoCurrencyCode(), request.getMdmCode(), request.getUrgencyCode(), productRegisterType.getValue());
+                if (accountPools.isEmpty()) {
+                    throw new Exception("Не найден пул счетов для branchCode=" + request.getBranchCode() + ", currencyCode=" + request.getIsoCurrencyCode() + ", mdmCode=" + request.getMdmCode() + ", priorityCode=" + request.getUrgencyCode() + ", registryTypeCode=" + productRegisterType.getValue() + " в таблице account_pool");
                 }
-                productRegister.setProductRegisterType(existingProductRegisterTypes.get(i));
-                productRegister.setState("OPEN");
-//                Account account = new Account();
-//                productRegister.setAccount(account);
-                productRegisterList.add(productRegister);
-                productRegisterRepository.save(productRegister);
+                AccountPool accountPool = accountPools.get(0);  // get the first returned record
+                List<Account> accounts = accountRepository.findByAccountPool(accountPool);
+
+                productRegisterList.add(productRegisterService.createAndSaveProductRegister(product.getId(), productRegisterTypes.get(i), accounts.get(0), request.getIsoCurrencyCode(), State.OPEN, accounts.get(0).getAccountNumber()));
             }
         }
         else {
@@ -122,7 +126,7 @@ public class ProductService {
                 agreement.setNumber(request.getInstanceArrangement().get(i).getNumber());
                 agreement.setArrangementType(request.getInstanceArrangement().get(i).getArrangementType());
                 try {
-                    agreement.setShedulerJobId(request.getInstanceArrangement().get(i).getShedulerJobId().longValue());
+                    agreement.setShedulerJobId(request.getInstanceArrangement().get(i).getShedulerJobId());
                 } catch (Exception e) {
                     ;
                 }
@@ -157,7 +161,7 @@ public class ProductService {
                     agreement.setClosingDate(cancelDate);
                 }
                 try {
-                    agreement.setValidityDuration(request.getInstanceArrangement().get(i).getValidityDuration().longValue());
+                    agreement.setValidityDuration(request.getInstanceArrangement().get(i).getValidityDuration());
                 } catch (Exception e) {
                     ;
                 }

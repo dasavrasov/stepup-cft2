@@ -5,7 +5,7 @@ import ru.stepup.model.ProductRegisterType;
 
 import java.util.List;
 
-public interface ProductRegisterTypeRepository extends JpaRepository<ProductRegisterType, Integer> {
+public interface ProductRegisterTypeRepository extends JpaRepository<ProductRegisterType, Long> {
     List<ProductRegisterType> findByAccountTypeAndProductClass_Value(String accountType, String productClassValue);
     ProductRegisterType findByValue(String value);
 }

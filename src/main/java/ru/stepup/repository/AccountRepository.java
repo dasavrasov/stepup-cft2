@@ -6,6 +6,6 @@ import ru.stepup.model.AccountPool;
 
 import java.util.List;
 
-public interface AccountRepository extends JpaRepository<Account, Integer> {
+public interface AccountRepository extends JpaRepository<Account, Long> {
     List<Account> findByAccountPool(AccountPool accountPool);
 }

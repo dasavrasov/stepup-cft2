@@ -2,6 +2,7 @@ package ru.stepup.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.stepup.model.*;
 import ru.stepup.repository.AccountPoolRepository;
 import ru.stepup.repository.AccountRepository;
@@ -18,6 +19,9 @@ public class AccountService {
     private final AccountPoolRepository accountPoolRepository;
 
     @Autowired
+    private ProductRegisterService productRegisterService;
+
+    @Autowired
     public AccountService(AccountRepository accountRepository, ProductRegisterRepository productRegisterRepository, ProductRegisterTypeRepository productRegisterTypeRepository, AccountPoolRepository accountPoolRepository) {
         this.accountRepository = accountRepository;
         this.productRegisterRepository = productRegisterRepository;
@@ -25,9 +29,11 @@ public class AccountService {
         this.accountPoolRepository = accountPoolRepository;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public ProductRegistryResponse createInstance(ProductRegistryRequest request) throws Exception {
+        ProductRegister productRegister=null;
         // Шаг 2
-        ProductRegister productRegister = productRegisterRepository.findByProductIdAndProductRegisterType_Value(request.getInstanceId(), request.getRegistryTypeCode());
+        productRegister = productRegisterRepository.findByProductIdAndProductRegisterType_Value(request.getInstanceId(), request.getRegistryTypeCode());
         if (productRegister != null) {
             throw new Exception("Параметр " + request.getRegistryTypeCode() + " тип регистра " + request.getRegistryTypeCode() + " уже существует для ЭП с ИД " + productRegister.getProductId());
         }
@@ -39,19 +45,12 @@ public class AccountService {
         //Шаг 4. Найти значение номера счета по параметрам branchCode, currencyCode, mdmCode, priorutyCode, registrTypeCode из RequstBody
         List<AccountPool> accountPools = accountPoolRepository.findByBranchCodeAndCurrencyCodeAndMdmCodeAndPriorityCodeAndRegistryTypeCode(request.getBranchCode(), request.getCurrencyCode(), request.getMdmCode(), request.getPriorityCode(), request.getRegistryTypeCode());
         if (accountPools.isEmpty()) {
-            throw new Exception("No account found with the provided parameters");
+            throw new Exception("Не найден пул счетов для branchCode=" + request.getBranchCode() + ", currencyCode=" + request.getCurrencyCode() + ", mdmCode=" + request.getMdmCode() + ", priorityCode=" + request.getPriorityCode() + ", registryTypeCode=" + request.getRegistryTypeCode() + " в таблице account_pool");
         }
         AccountPool accountPool = accountPools.get(0);  // get the first returned record
         List<Account> accounts = accountRepository.findByAccountPool(accountPool);
 
-        ProductRegister productRegistry = new ProductRegister();
-        productRegister.setProductId(request.getInstanceId().longValue());
-        productRegister.setProductRegisterType(productRegisterType);
-        productRegister.setAccount(accounts.get(0));
-        productRegister.setCurrencyCode(request.getCurrencyCode());
-        productRegister.setState("OPEN");
-//        productRegister.setAccountNumber(accountPool.getAccount().getNumber());
-        productRegisterRepository.save(productRegister);
+        productRegister=productRegisterService.createAndSaveProductRegister(request.getInstanceId(), productRegisterType, accounts.get(0), request.getCurrencyCode(), State.OPEN, accounts.get(0).getAccountNumber());
 
         ProductRegistryResponse response = new ProductRegistryResponse();
         ProductRegistryResponse.Data responseData = new ProductRegistryResponse.Data();
