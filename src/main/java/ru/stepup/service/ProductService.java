@@ -95,13 +95,14 @@ public class ProductService {
             for (int i = 0; i < productRegisterTypes.size(); i++) {
                 ProductRegisterType productRegisterType = productRegisterTypes.get(i);
                 List<AccountPool> accountPools = accountPoolRepository.findByBranchCodeAndCurrencyCodeAndMdmCodeAndPriorityCodeAndRegistryTypeCode(request.getBranchCode(), request.getIsoCurrencyCode(), request.getMdmCode(), request.getUrgencyCode(), productRegisterType.getValue());
-                if (accountPools.isEmpty()) {
-                    throw new Exception("Не найден пул счетов для branchCode=" + request.getBranchCode() + ", currencyCode=" + request.getIsoCurrencyCode() + ", mdmCode=" + request.getMdmCode() + ", priorityCode=" + request.getUrgencyCode() + ", registryTypeCode=" + productRegisterType.getValue() + " в таблице account_pool");
-                }
-                AccountPool accountPool = accountPools.get(0);  // get the first returned record
-                List<Account> accounts = accountRepository.findByAccountPool(accountPool);
+                //если пул счетов не найден - просто не создаем ПР - в этом случае, можно создать ПР отдельно через вызов account/create
+                if (!accountPools.isEmpty()) {
+                    //если пул счетов найден - создаем ПР
+                    AccountPool accountPool = accountPools.get(0);  // get the first returned record
+                    List<Account> accounts = accountRepository.findByAccountPool(accountPool);
 
-                productRegisterList.add(productRegisterService.createAndSaveProductRegister(product.getId(), productRegisterTypes.get(i), accounts.get(0), request.getIsoCurrencyCode(), State.OPEN, accounts.get(0).getAccountNumber()));
+                    productRegisterList.add(productRegisterService.createAndSaveProductRegister(product.getId(), productRegisterTypes.get(i), accounts.get(0), request.getIsoCurrencyCode(), State.OPEN, accounts.get(0).getAccountNumber()));
+                }
             }
         }
         else {
