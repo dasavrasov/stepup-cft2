@@ -1,11 +1,21 @@
 version: '3.8'
 services:
+  corporate_settlement_db:
+    image: postgres:15-alpine
+    networks:
+      - appnetwork
+    ports:
+      - 5431:5432
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=12345
   app:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - 8080:8080
+      - 9000:9000
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://corporate_settlement_db:5432/postgres
       - SPRING_DATASOURCE_USERNAME=postgres
@@ -14,16 +24,6 @@ services:
       - appnetwork
     depends_on:
       - corporate_settlement_db
-  corporate_settlement_db:
-    image: postgres:15-alpine
-    ports:
-      - 5431:5432
-    environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=12345
-    networks:
-      - appnetwork
 networks:
   appnetwork:
     driver: bridge

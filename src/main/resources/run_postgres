@@ -1,0 +1,1 @@
+docker run --name corporate_settlement_db -e POSTGRES_PASSWORD=12345 -p 5431:5432 -d postgres:15-alpine
