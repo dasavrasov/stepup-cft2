@@ -1,6 +1,7 @@
 package ru.stepup.stepup_cft2;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.util.TestPropertyValues;
@@ -10,6 +11,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -31,7 +34,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class ProductAccountServiceTest extends AbstractIntegrationTest {
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(initializers = { ProductAccountServiceTest.Initializer.class })
+class ProductAccountServiceTest {
     @Container
     public static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15-alpine")
             .withDatabaseName("test")
@@ -98,31 +103,6 @@ class ProductAccountServiceTest extends AbstractIntegrationTest {
     @Order(3)
     @DisplayName("Создание ДС для ЭП")
     void createFirstAgreementTest() {
-//        {
-//            "instanceId": 1,
-//                "productType": "договор",
-//                "productCode": "03.012.002",
-//                "registerType": "1",
-//                "mdmCode": "13",
-//                "contractNumber": "РКО-ДОГ-ЮЛ-1",
-//                "contractDate": "2024-07-06",
-//                "priority": 1,
-//                "contractId": 456,
-//                "BranchCode": "0021",
-//                "IsoCurrencyCode": "500",
-//                "urgencyCode": "00",
-//                "additionalPropertiesVip": [],
-//            "instanceArrangement":[
-//            {
-//                "Number":"РКО-ДОГ-ЮЛ-1/001",
-//                    "openingDate":"2022-01-15"
-//            },
-//            {
-//                "Number":"РКО-ДОГ-ЮЛ-1/002",
-//                    "openingDate":"2022-03-20"
-//            }
-//   ]
-//        }
         ProductInstanceRequest request=buildProductInstanceRequest("1");
         ProductInstanceRequest.InstanceArrangement instanceArrangement1 = new ProductInstanceRequest.InstanceArrangement();
         List<ProductInstanceRequest.InstanceArrangement> instanceArrangement= new ArrayList<>();
@@ -153,31 +133,6 @@ class ProductAccountServiceTest extends AbstractIntegrationTest {
     @Order(4)
     @DisplayName("Создание второго ДС для ЭП с тем де номером")
     void createSecondAgreementTest() {
-//        {
-//            "instanceId": 1,
-//                "productType": "договор",
-//                "productCode": "03.012.002",
-//                "registerType": "1",
-//                "mdmCode": "13",
-//                "contractNumber": "РКО-ДОГ-ЮЛ-1",
-//                "contractDate": "2024-07-06",
-//                "priority": 1,
-//                "contractId": 456,
-//                "BranchCode": "0021",
-//                "IsoCurrencyCode": "500",
-//                "urgencyCode": "00",
-//                "additionalPropertiesVip": [],
-//            "instanceArrangement":[
-//            {
-//                "Number":"РКО-ДОГ-ЮЛ-1/001",
-//                    "openingDate":"2022-01-15"
-//            },
-//            {
-//                "Number":"РКО-ДОГ-ЮЛ-1/002",
-//                    "openingDate":"2022-03-20"
-//            }
-//   ]
-//        }
         ProductInstanceRequest request = buildProductInstanceRequest("1");
         List<ProductInstanceRequest.InstanceArrangement> instanceArrangement = new ArrayList<>();
         ProductInstanceRequest.InstanceArrangement instanceArrangement1 = new ProductInstanceRequest.InstanceArrangement();
